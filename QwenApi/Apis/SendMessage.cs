@@ -116,7 +116,7 @@ namespace QwenApi.Apis
         public string SubChatType { get; set; } = "t2t";
     }
 
-    internal class SendMessage
+    public class SendMessage
     {
         public static async IAsyncEnumerable<string> ExecuteAsync(
             string chatId,

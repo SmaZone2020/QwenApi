@@ -5,7 +5,7 @@ namespace QwenApi.Models
     public class ConfigManager
     {
         private readonly string _configFilePath;
-        private readonly object _lock = new object();
+        private readonly object _lock = new();
 
         public string BxUa { get; set; } = "";
         public string Cookie { get; set; } = "";
