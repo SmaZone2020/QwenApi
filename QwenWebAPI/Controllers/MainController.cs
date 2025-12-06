@@ -13,9 +13,24 @@ namespace QwenWebAPI.Controllers
     {
         private readonly ILogger<MainController> _logger = logger;
 
+        private bool IsAuthValid()
+        {
+            if (!Request.Headers.TryGetValue("Auth", out var authHeader))
+                return false;
+
+            var expected = "YOUR API KEY";
+            if (string.IsNullOrEmpty(expected))
+                return false;
+
+            return string.Equals(authHeader.ToString(), expected, StringComparison.Ordinal);
+        }
+
         [HttpGet("sessions")]
         public async Task<ActionResult<List<SessionItem>>> GetSessionList()
         {
+            if (!IsAuthValid())
+                return Unauthorized("无效的Auth请求头");
+
             if (!Runtimes.cfgMgr.IsConfigured)
                 return BadRequest("配置未完成，请检查 config/config.txt");
 
@@ -28,6 +43,9 @@ namespace QwenWebAPI.Controllers
         [HttpPost("sessions")]
         public async Task<ActionResult<SessionData>> CreateSession()
         {
+            if (!IsAuthValid())
+                return Unauthorized("无效的Auth请求头");
+
             if (!Runtimes.cfgMgr.IsConfigured)
                 return BadRequest("配置未完成");
 
@@ -45,6 +63,9 @@ namespace QwenWebAPI.Controllers
         [HttpGet("sessions/{sessionId}")]
         public async Task<ActionResult<SessionData>> GetSessionHistory(string sessionId)
         {
+            if (!IsAuthValid())
+                return Unauthorized("无效的Auth请求头");
+
             if (!Guid.TryParse(sessionId, out _))
                 return BadRequest("无效的会话ID");
 
@@ -60,6 +81,13 @@ namespace QwenWebAPI.Controllers
             string sessionId,
             [FromBody] SendMessageRequest request)
         {
+            if (!IsAuthValid())
+            {
+                Response.StatusCode = 401;
+                await Response.WriteAsync("无效的Auth请求头");
+                return;
+            }
+
             if (!Runtimes.cfgMgr.IsConfigured)
             {
                 Response.StatusCode = 400;
