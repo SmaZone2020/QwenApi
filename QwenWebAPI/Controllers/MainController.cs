@@ -18,7 +18,7 @@ namespace QwenWebAPI.Controllers
             if (!Request.Headers.TryGetValue("Auth", out var authHeader))
                 return false;
 
-            var expected = "YOUR API KEY";
+            var expected = "0a026da3735c2b81c6f318493e3e94d43dc9da12c34360190fe5a7eb8d24d365";
             if (string.IsNullOrEmpty(expected))
                 return false;
 
@@ -38,6 +38,18 @@ namespace QwenWebAPI.Controllers
             if (sessions == null)
                 return StatusCode(500, "无法获取会话列表");
             return Ok(sessions);
+        }
+
+        [HttpGet("models")]
+        public async Task<ActionResult<List<QwenModelItem>>> GetModelList()
+        {
+            if (!IsAuthValid())
+                return Unauthorized("无效的Auth请求头");
+
+            var sessions = await GetQwenModels.ExecuteAsync();
+            if (sessions == null)
+                return StatusCode(500, "无法获取模型列表");
+            return Ok(sessions.Data);
         }
 
         [HttpPost("sessions")]
