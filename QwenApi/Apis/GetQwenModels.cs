@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using QwenApi.Helper;
 using QwenApi.Models.ResponseM;
 using RestSharp;
@@ -13,6 +14,7 @@ namespace QwenApi.Apis
 {
     public class QwenModelList
     {
+        public QwenModelList() { }
         [JsonProperty("data")]
         public List<QwenModelItem> Data = [];
     }
@@ -141,8 +143,12 @@ namespace QwenApi.Apis
                 return null;
             }
 
-            var apiResponse = JsonConvert.DeserializeObject<QwenModelList>(response.Content);
-            return apiResponse;
+            var apiResponse = JsonConvert.DeserializeObject<ApiResponse<JToken>>(response.Content);
+            if (apiResponse?.IsSuccess == true && apiResponse.Data != null)
+            {
+                return apiResponse.Data.ToObject<QwenModelList>();
+            }
+            return null;
         }
     }
 }

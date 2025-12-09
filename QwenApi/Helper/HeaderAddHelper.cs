@@ -9,7 +9,7 @@ namespace QwenApi.Helper
 {
     public static class HeaderAddHelper
     {
-        public static RestRequest AddCommonHeaders(this RestRequest request)
+        public static RestRequest AddCommonHeaders(this RestRequest request,string BxUA = "",string BxUmidtoken = "")
         {
             request.AddHeader("bx-ua", Runtimes.cfgMgr.BxUa);
             request.AddHeader("bx-umidtoken", Runtimes.cfgMgr.BxUmidtoken);
@@ -20,12 +20,20 @@ namespace QwenApi.Helper
             return request;
         }
 
-        public static HttpRequestMessage AddCommonHeaders(this HttpRequestMessage request)
+        public static HttpRequestMessage AddCommonHeaders(this HttpRequestMessage request, string BxUA = "", string BxUmidtoken = "")
         {
             var cfg = Runtimes.cfgMgr;
 
-            request.Headers.TryAddWithoutValidation("bx-ua", cfg.BxUa);
-            request.Headers.TryAddWithoutValidation("bx-umidtoken", cfg.BxUmidtoken);
+            if(BxUA != "" && BxUmidtoken != "")
+            {
+                request.Headers.TryAddWithoutValidation("bx-ua", BxUA);
+                request.Headers.TryAddWithoutValidation("bx-umidtoken", BxUmidtoken);
+            }
+            else
+            {
+                request.Headers.TryAddWithoutValidation("bx-ua", cfg.BxUa);
+                request.Headers.TryAddWithoutValidation("bx-umidtoken", cfg.BxUmidtoken);
+            }
             request.Headers.TryAddWithoutValidation("cookie", cfg.Cookie);
             request.Headers.Referrer = new Uri("https://chat.qwen.ai/");
             request.Headers.TryAddWithoutValidation("accept", "application/json");

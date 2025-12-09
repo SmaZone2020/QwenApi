@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using QwenApi.Helper;
 using QwenApi.Models.RequestM;
 using QwenApi.Models.ResponseM;
@@ -74,7 +75,7 @@ namespace QwenApi.Apis
             public List<string> ChildrenIds { get; set; }
             public List<object> Files { get; set; } 
             public long Timestamp { get; set; }
-            public List<ContentItem> ContentList { get; set; }
+            public List<ContentItem> Content_List { get; set; }
         }
 
         public class FeatureConfig
@@ -118,6 +119,7 @@ namespace QwenApi.Apis
             public long Timestamp { get; set; }
             public List<string> Tags { get; set; }
         }
+
         public static async Task<SessionData> ExecuteAsync(string id)
         {
             var request = new RestRequest($"/api/v2/chats/{id}", Method.Get);
@@ -125,13 +127,19 @@ namespace QwenApi.Apis
 
             var response = await Runtimes.restClient.ExecuteAsync(request);
 
-            if (response.StatusCode != System.Net.HttpStatusCode.OK || string.IsNullOrEmpty(response.Content))
+            if (response.StatusCode != System.Net.HttpStatusCode.OK ||
+                string.IsNullOrEmpty(response.Content))
             {
                 return null;
             }
 
-            var apiResponse = JsonConvert.DeserializeObject<ApiResponse<SessionData>>(response.Content);
-            return apiResponse?.Data;
+            var apiResponse = JsonConvert.DeserializeObject<ApiResponse<JToken>>(response.Content);
+            if (apiResponse?.IsSuccess == true && apiResponse.Data != null)
+            {
+                return apiResponse.Data.ToObject<SessionData>();
+            }
+            return null;
+
         }
     }
 }

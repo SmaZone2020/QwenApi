@@ -23,6 +23,13 @@ namespace QwenApi.Models
             Load();
         }
 
+        public void LoadString(string bxua,string cookie, string bxUmidtoken)
+        {
+            BxUa = bxua.Trim();
+            Cookie = cookie.Trim();
+            BxUmidtoken = bxUmidtoken.Trim();
+        }
+
         public bool Load()
         {
             try

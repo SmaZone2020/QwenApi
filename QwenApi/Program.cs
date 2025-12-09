@@ -53,12 +53,14 @@ var sessionTable = new Table().Border(TableBorder.Rounded).Expand();
 sessionTable.AddColumn("[#7B61FF]序号[/]");
 sessionTable.AddColumn("[#7B61FF]标题[/]");
 sessionTable.AddColumn("[#7B61FF]ID[/]");
+sessionTable.AddColumn("[#7B61FF]更新时间[/]");
 for (int i = 0; i < sessions.Count; i++)
 {
     sessionTable.AddRow(
         $"[grey]{i}[/]",
         $"[#7B61FF]{Markup.Escape($"{sessions[i].Title}")}[/]",
-        $"[grey]{Markup.Escape($"{sessions[i].ID}")}[/]"
+        $"[grey]{Markup.Escape($"{sessions[i].ID}")}[/]",
+        $"[grey]{Markup.Escape($"{GetQwenModels.GetDateForTimestamp(sessions[i].UpdatedAt):yyyy-MM-dd HH:mm:ss}")}[/]"
     );
 }
 AnsiConsole.Write(sessionTable);

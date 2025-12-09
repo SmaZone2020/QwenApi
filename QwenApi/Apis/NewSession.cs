@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using QwenApi.Helper;
 using QwenApi.Models.RequestM;
 using QwenApi.Models.ResponseM;
@@ -26,8 +27,12 @@ namespace QwenApi.Apis
                 return null;
             }
 
-            var apiResponse = JsonConvert.DeserializeObject<ApiResponse<NewReturn>>(response.Content);
-            return apiResponse.Data;
+            var apiResponse = JsonConvert.DeserializeObject<ApiResponse<JToken>>(response.Content);
+            if (apiResponse?.IsSuccess == true && apiResponse.Data != null)
+            {
+                return apiResponse.Data.ToObject<NewReturn>();
+            }
+            return null;
         }
     }
 }
