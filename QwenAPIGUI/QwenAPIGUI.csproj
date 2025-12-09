@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Exe</OutputType>
     <TargetFramework>net9.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\QwenApi\QwenApi.csproj" />
+    <ProjectReference Include="..\QwenWebAPI\QwenWebAPI.csproj" />
   </ItemGroup>
 
 </Project>

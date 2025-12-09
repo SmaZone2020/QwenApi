@@ -30,6 +30,7 @@
         {
             webView21 = new Microsoft.Web.WebView2.WinForms.WebView2();
             groupBox1 = new GroupBox();
+            webapi = new Button();
             passwordInput = new TextBox();
             emailInput = new TextBox();
             button1 = new Button();
@@ -61,6 +62,7 @@
             // 
             // groupBox1
             // 
+            groupBox1.Controls.Add(webapi);
             groupBox1.Controls.Add(passwordInput);
             groupBox1.Controls.Add(emailInput);
             groupBox1.Controls.Add(button1);
@@ -70,6 +72,17 @@
             groupBox1.TabIndex = 6;
             groupBox1.TabStop = false;
             groupBox1.Text = "Auth";
+            // 
+            // webapi
+            // 
+            webapi.Location = new Point(275, 83);
+            webapi.Name = "webapi";
+            webapi.Size = new Size(88, 29);
+            webapi.TabIndex = 7;
+            webapi.Tag = "Start WebAPI service";
+            webapi.Text = "WebAPI";
+            webapi.UseVisualStyleBackColor = true;
+            webapi.Click += webapi_Click;
             // 
             // passwordInput
             // 
@@ -91,13 +104,14 @@
             // 
             // button1
             // 
-            button1.Location = new Point(135, 83);
+            button1.Location = new Point(137, 83);
             button1.Margin = new Padding(4, 3, 4, 3);
             button1.Name = "button1";
             button1.Size = new Size(115, 29);
             button1.TabIndex = 4;
             button1.Text = "Login";
             button1.UseVisualStyleBackColor = true;
+            button1.Click += button1_Click;
             // 
             // groupBox2
             // 
@@ -218,5 +232,6 @@
         private TextBox userInput;
         private Button sendMessageBtn;
         private FlowLayoutPanel chatHistory;
+        private Button webapi;
     }
 }

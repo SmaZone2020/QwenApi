@@ -356,5 +356,12 @@ namespace QwenAPIGUI
             if (userInput.Text.Length > 0) sendMessageBtn.Enabled = true;
             else sendMessageBtn.Enabled = false;
         }
+
+        TokenAPI apiService = new();
+        private void webapi_Click(object sender, EventArgs e)
+        {
+            apiService.Start();
+        }
+
     }
 }
