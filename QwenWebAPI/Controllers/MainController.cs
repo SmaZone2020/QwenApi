@@ -125,11 +125,17 @@ namespace QwenWebAPI.Controllers
 
             try
             {
+                if(request.FileUrl != null)
+                {
+
+                }
+
                 await foreach (string jsonData in QwenApi.Apis.SendMessage.ExecuteAsync(
                     chatId: sessionId,
                     messageContent: request.Content,
                     parentId: parentId,
-                    useThink: false))
+                    useThink: false,
+                    imgUrl: request.FileUrl))
                 {
                     try
                     {
@@ -165,25 +171,12 @@ namespace QwenWebAPI.Controllers
                 await Response.Body.FlushAsync();
             }
         }
-        private static string GetContentType(string extension)
-        {
-            return extension.ToLowerInvariant() switch
-            {
-                ".jpg" or ".jpeg" => "image/jpeg",
-                ".png" => "image/png",
-                ".gif" => "image/gif",
-                ".bmp" => "image/bmp",
-                ".webp" => "image/webp",
-                ".svg" => "image/svg+xml",
-                _ => "application/octet-stream"
-            };
-        }
-
 
     }
 
     public class SendMessageRequest
     {
         public string Content { get; set; } = string.Empty;
+        public string[]? FileUrl {  get; set; } = null;
     }
 }

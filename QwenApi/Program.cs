@@ -14,16 +14,6 @@ if (!Runtimes.cfgMgr.IsConfigured)
     return;
 }
 
-var fileId = await UploadQwenImage.ExecuteAsync(@"C:\Users\0x536D61\Pictures\b_6f6a885b92304d5f31d7a2c5ad3b5c65.jpg");
-if (fileId != null)
-{
-    Console.WriteLine($"上传成功，FileId: {fileId}");
-}
-else
-{
-    Console.WriteLine("上传失败");
-}
-return;
 var qwenModels = await GetQwenModels.ExecuteAsync();
 if (qwenModels == null || qwenModels.Data.Count == 0)
 {

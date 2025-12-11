@@ -215,6 +215,7 @@ namespace QwenApi.Apis
             string? parentId,
             string model = "qwen3-max-2025-10-30",
             bool useThink = false,
+            string[] imgUrl = null,
             [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
             var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
@@ -230,8 +231,20 @@ namespace QwenApi.Apis
                 Extra = new()
                 {
                     Meta = new() { SubChatType = "t2t" }
-                }
+                },
             };
+            if (imgUrl != null)
+            {
+                chatMessage.Files = [];
+                foreach (var url in imgUrl)
+                {
+                    chatMessage.Files.Add(CreatFile(Path.Combine(Path.GetRandomFileName(),".png"),url));
+                }
+            }
+            else
+            {
+                chatMessage.Files = [];
+            }
 
             var chatReq = new ChatCompletionRequest
             {
@@ -269,15 +282,13 @@ namespace QwenApi.Apis
             }
         }
 
-        public static QwenFile? CreatFile(string fileName)
+        public static QwenFile? CreatFile(string fileName,string url)
         {
-            if (!File.Exists(fileName)) return null;
             return new()
             {
                 Type = GetFileType(fileName),
-                Url = fileName,
+                Url = url
             };
-
         }
 
         public static string GetFileType(string filePath)
