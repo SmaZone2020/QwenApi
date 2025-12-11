@@ -18,11 +18,10 @@ namespace QwenWebAPI.Controllers
             if (!Request.Headers.TryGetValue("Auth", out var authHeader))
                 return false;
 
-            var expected = "0a026da3735c2b81c6f318493e3e94d43dc9da12c34360190fe5a7eb8d24d365";
-            if (string.IsNullOrEmpty(expected))
+            if (string.IsNullOrEmpty(Runtimes.AuthToken))
                 return false;
 
-            return string.Equals(authHeader.ToString(), expected, StringComparison.Ordinal);
+            return string.Equals(authHeader.ToString(), Runtimes.AuthToken, StringComparison.Ordinal);
         }
 
         [HttpGet("sessions")]
@@ -31,7 +30,7 @@ namespace QwenWebAPI.Controllers
             if (!IsAuthValid())
                 return Unauthorized("无效的Auth请求头");
 
-            if (!Runtimes.cfgMgr.IsConfigured)
+            if (!QwenApi.Runtimes.cfgMgr.IsConfigured)
                 return BadRequest("配置未完成，请检查 config/config.txt");
 
             var sessions = await QwenApi.Apis.GetSessionList.ExecuteAsync();
@@ -52,13 +51,14 @@ namespace QwenWebAPI.Controllers
             return Ok(sessions.Data);
         }
 
+
         [HttpPost("sessions")]
         public async Task<ActionResult<SessionData>> CreateSession()
         {
             if (!IsAuthValid())
                 return Unauthorized("无效的Auth请求头");
 
-            if (!Runtimes.cfgMgr.IsConfigured)
+            if (!QwenApi.Runtimes.cfgMgr.IsConfigured)
                 return BadRequest("配置未完成");
 
             var resp = await NewSession.ExecuteAsync(new SessionReq());
@@ -100,7 +100,7 @@ namespace QwenWebAPI.Controllers
                 return;
             }
 
-            if (!Runtimes.cfgMgr.IsConfigured)
+            if (!QwenApi.Runtimes.cfgMgr.IsConfigured)
             {
                 Response.StatusCode = 400;
                 await Response.WriteAsync("配置未完成");
@@ -165,6 +165,21 @@ namespace QwenWebAPI.Controllers
                 await Response.Body.FlushAsync();
             }
         }
+        private static string GetContentType(string extension)
+        {
+            return extension.ToLowerInvariant() switch
+            {
+                ".jpg" or ".jpeg" => "image/jpeg",
+                ".png" => "image/png",
+                ".gif" => "image/gif",
+                ".bmp" => "image/bmp",
+                ".webp" => "image/webp",
+                ".svg" => "image/svg+xml",
+                _ => "application/octet-stream"
+            };
+        }
+
+
     }
 
     public class SendMessageRequest

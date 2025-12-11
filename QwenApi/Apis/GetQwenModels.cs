@@ -14,7 +14,6 @@ namespace QwenApi.Apis
 {
     public class QwenModelList
     {
-        public QwenModelList() { }
         [JsonProperty("data")]
         public List<QwenModelItem> Data = [];
     }
@@ -131,6 +130,7 @@ namespace QwenApi.Apis
     {
         public static DateTime GetDateForTimestamp(long timestamp)
             => TimeZone.CurrentTimeZone.ToLocalTime(new(1970, 1, 1)).AddSeconds(timestamp);
+
         public static async Task<QwenModelList?> ExecuteAsync()
         {
             var request = new RestRequest($"/api/models", Method.Get);
@@ -143,10 +143,10 @@ namespace QwenApi.Apis
                 return null;
             }
 
-            var apiResponse = JsonConvert.DeserializeObject<ApiResponse<JToken>>(response.Content);
-            if (apiResponse?.IsSuccess == true && apiResponse.Data != null)
+            var apiResponse = JsonConvert.DeserializeObject<QwenModelList>(response.Content);
+            if (apiResponse != null && apiResponse.Data != null)
             {
-                return apiResponse.Data.ToObject<QwenModelList>();
+                return apiResponse;
             }
             return null;
         }

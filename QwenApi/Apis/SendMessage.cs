@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.VisualBasic.FileIO;
+using Newtonsoft.Json;
 using QwenApi.Helper;
 using QwenApi.Models.RequestM;
 using QwenApi.Models.ResponseM;
@@ -10,6 +11,7 @@ using System.Net;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.XPath;
 
 namespace QwenApi.Apis
 {
@@ -62,7 +64,7 @@ namespace QwenApi.Apis
         public string UserAction { get; set; } = "chat";
 
         [JsonProperty("files")]
-        public List<object> Files { get; set; } = new List<object>();
+        public List<QwenFile> Files { get; set; } = [];
 
         [JsonProperty("timestamp")]
         public long Timestamp { get; set; }
@@ -84,6 +86,95 @@ namespace QwenApi.Apis
 
         [JsonProperty("parent_id")]
         public string Parent_id { get; set; }
+    }
+    public class QwenFile
+    {
+        [JsonProperty("type")]
+        public string Type { get; set; }
+
+        [JsonProperty("file")]
+        public QwenFileInfo File { get; set; }
+
+        [JsonProperty("id")]
+        public string Id { get; set; }
+
+        [JsonProperty("url")]
+        public string Url { get; set; }
+
+        [JsonProperty("name")]
+        public string Name { get; set; }
+
+        [JsonProperty("collection_name")]
+        public string CollectionName { get; set; }
+
+        [JsonProperty("progress")]
+        public int Progress { get; set; }
+
+        [JsonProperty("status")]
+        public string Status { get; set; }
+
+        [JsonProperty("greenNet")]
+        public string GreenNet { get; set; }
+
+        [JsonProperty("size")]
+        public int Size { get; set; }
+
+        [JsonProperty("error")]
+        public string Error { get; set; }
+
+        [JsonProperty("itemId")]
+        public string ItemId { get; set; }
+
+        [JsonProperty("file_type")]
+        public string FileType { get; set; }
+
+        [JsonProperty("showType")]
+        public string ShowType { get; set; }
+
+        [JsonProperty("file_class")]
+        public string FileClass { get; set; }
+
+        [JsonProperty("uploadTaskId")]
+        public string UploadTaskId { get; set; }
+    }
+
+    public class QwenFileInfo
+    {
+        [JsonProperty("created_at")]
+        public long CreatedAt { get; set; }
+
+        [JsonProperty("data")]
+        public object Data { get; set; }
+
+        [JsonProperty("filename")]
+        public string Filename { get; set; }
+
+        [JsonProperty("hash")]
+        public object Hash { get; set; }
+
+        [JsonProperty("id")]
+        public string Id { get; set; }
+
+        [JsonProperty("user_id")]
+        public string UserId { get; set; }
+
+        [JsonProperty("meta")]
+        public QwenFileMeta Meta { get; set; }
+
+        [JsonProperty("update_at")]
+        public long UpdateAt { get; set; }
+    }
+
+    public class QwenFileMeta
+    {
+        [JsonProperty("name")]
+        public string Name { get; set; }
+
+        [JsonProperty("size")]
+        public int Size { get; set; }
+
+        [JsonProperty("content_type")]
+        public string ContentType { get; set; }
     }
 
     public class FeatureConfig
@@ -177,6 +268,34 @@ namespace QwenApi.Apis
                 }
             }
         }
+
+        public static QwenFile? CreatFile(string fileName)
+        {
+            if (!File.Exists(fileName)) return null;
+            return new()
+            {
+                Type = GetFileType(fileName),
+                Url = fileName,
+            };
+
+        }
+
+        public static string GetFileType(string filePath)
+        {
+            if (string.IsNullOrWhiteSpace(filePath))
+                return "file";
+
+            string extension = Path.GetExtension(filePath);
+            if (ImageExtensions.Contains(extension))
+                return "image";
+
+            return "file";
+        }
+
+        private static readonly HashSet<string> ImageExtensions = new(StringComparer.OrdinalIgnoreCase)
+        {
+            ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tiff", ".tif", ".webp", ".svg", ".ico"
+        };
 
     }
 }

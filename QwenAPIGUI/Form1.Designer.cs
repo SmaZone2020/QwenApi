@@ -55,7 +55,7 @@
             webView21.Location = new Point(0, 12);
             webView21.Margin = new Padding(4, 3, 4, 3);
             webView21.Name = "webView21";
-            webView21.Size = new Size(362, 601);
+            webView21.Size = new Size(325, 601);
             webView21.Source = new Uri("https://chat.qwen.ai/auth", UriKind.Absolute);
             webView21.TabIndex = 0;
             webView21.ZoomFactor = 1D;
@@ -66,16 +66,16 @@
             groupBox1.Controls.Add(passwordInput);
             groupBox1.Controls.Add(emailInput);
             groupBox1.Controls.Add(button1);
-            groupBox1.Location = new Point(693, 12);
+            groupBox1.Location = new Point(656, 12);
             groupBox1.Name = "groupBox1";
-            groupBox1.Size = new Size(383, 126);
+            groupBox1.Size = new Size(420, 126);
             groupBox1.TabIndex = 6;
             groupBox1.TabStop = false;
             groupBox1.Text = "Auth";
             // 
             // webapi
             // 
-            webapi.Location = new Point(275, 83);
+            webapi.Location = new Point(326, 91);
             webapi.Name = "webapi";
             webapi.Size = new Size(88, 29);
             webapi.TabIndex = 7;
@@ -115,13 +115,12 @@
             // 
             // groupBox2
             // 
-            groupBox2.Controls.Add(bxList);
             groupBox2.Controls.Add(newChatBtn);
             groupBox2.Controls.Add(refreshBtn);
             groupBox2.Controls.Add(chatList);
-            groupBox2.Location = new Point(369, 12);
+            groupBox2.Location = new Point(332, 12);
             groupBox2.Name = "groupBox2";
-            groupBox2.Size = new Size(318, 601);
+            groupBox2.Size = new Size(318, 537);
             groupBox2.TabIndex = 7;
             groupBox2.TabStop = false;
             groupBox2.Text = "Chat Sessions";
@@ -129,9 +128,9 @@
             // bxList
             // 
             bxList.FormattingEnabled = true;
-            bxList.Location = new Point(6, 528);
+            bxList.Location = new Point(332, 555);
             bxList.Name = "bxList";
-            bxList.Size = new Size(306, 58);
+            bxList.Size = new Size(318, 58);
             bxList.TabIndex = 9;
             // 
             // newChatBtn
@@ -167,11 +166,11 @@
             // 
             // userInput
             // 
-            userInput.Location = new Point(693, 450);
+            userInput.Location = new Point(656, 450);
             userInput.MaxLength = 999999;
             userInput.Multiline = true;
             userInput.Name = "userInput";
-            userInput.Size = new Size(383, 163);
+            userInput.Size = new Size(420, 163);
             userInput.TabIndex = 9;
             userInput.TextChanged += userInput_TextChanged;
             // 
@@ -189,9 +188,9 @@
             // chatHistory
             // 
             chatHistory.AutoScroll = true;
-            chatHistory.Location = new Point(693, 145);
+            chatHistory.Location = new Point(656, 145);
             chatHistory.Name = "chatHistory";
-            chatHistory.Size = new Size(382, 299);
+            chatHistory.Size = new Size(419, 299);
             chatHistory.TabIndex = 11;
             // 
             // Form1
@@ -199,6 +198,7 @@
             AutoScaleDimensions = new SizeF(8F, 18F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1087, 618);
+            Controls.Add(bxList);
             Controls.Add(chatHistory);
             Controls.Add(sendMessageBtn);
             Controls.Add(userInput);
