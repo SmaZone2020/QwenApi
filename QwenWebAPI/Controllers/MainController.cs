@@ -1,17 +1,19 @@
 using Microsoft.AspNetCore.Mvc;
-using QwenApi;
 using QwenApi.Apis;
+using QwenApi.Common;
 using QwenApi.Models.RequestM;
 using QwenApi.Models.ResponseM;
+using QwenApi.Services;
 using static QwenApi.Apis.GetSessionHistory;
 
 namespace QwenWebAPI.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class MainController(ILogger<MainController> logger) : ControllerBase
+    public class MainController(ILogger<MainController> logger, IQwenApiService qwenApiService) : ControllerBase
     {
         private readonly ILogger<MainController> _logger = logger;
+        private readonly IQwenApiService _qwenApiService = qwenApiService;
 
         private bool IsAuthValid()
         {
@@ -28,14 +30,14 @@ namespace QwenWebAPI.Controllers
         public async Task<ActionResult<List<SessionItem>>> GetSessionList()
         {
             if (!IsAuthValid())
-                return Unauthorized("ÎÞÐ§µÄAuthÇëÇóÍ·");
+                return Unauthorized("ï¿½ï¿½Ð§ï¿½ï¿½Authï¿½ï¿½ï¿½ï¿½Í·");
 
-            if (!QwenApi.Runtimes.cfgMgr.IsConfigured)
-                return BadRequest("ÅäÖÃÎ´Íê³É£¬Çë¼ì²é config/config.txt");
+            if (!QwenApi.Common.Runtimes.cfgMgr.IsConfigured)
+                return BadRequest("ï¿½ï¿½ï¿½ï¿½Î´ï¿½ï¿½É£ï¿½ï¿½ï¿½ï¿½ï¿½ config/config.json");
 
-            var sessions = await QwenApi.Apis.GetSessionList.ExecuteAsync();
+            var sessions = await _qwenApiService.GetSessionsAsync();
             if (sessions == null)
-                return StatusCode(500, "ÎÞ·¨»ñÈ¡»á»°ÁÐ±í");
+                return StatusCode(500, "ï¿½Þ·ï¿½ï¿½ï¿½È¡ï¿½á»°ï¿½Ð±ï¿½");
             return Ok(sessions);
         }
 
@@ -43,31 +45,30 @@ namespace QwenWebAPI.Controllers
         public async Task<ActionResult<List<QwenModelItem>>> GetModelList()
         {
             if (!IsAuthValid())
-                return Unauthorized("ÎÞÐ§µÄAuthÇëÇóÍ·");
+                return Unauthorized("ï¿½ï¿½Ð§ï¿½ï¿½Authï¿½ï¿½ï¿½ï¿½Í·");
 
-            var sessions = await GetQwenModels.ExecuteAsync();
-            if (sessions == null)
-                return StatusCode(500, "ÎÞ·¨»ñÈ¡Ä£ÐÍÁÐ±í");
-            return Ok(sessions.Data);
+            var models = await _qwenApiService.GetModelsAsync();
+            if (models == null)
+                return StatusCode(500, "ï¿½Þ·ï¿½ï¿½ï¿½È¡Ä£ï¿½ï¿½ï¿½Ð±ï¿½");
+            return Ok(models.Data);
         }
-
 
         [HttpPost("sessions")]
         public async Task<ActionResult<SessionData>> CreateSession()
         {
             if (!IsAuthValid())
-                return Unauthorized("ÎÞÐ§µÄAuthÇëÇóÍ·");
+                return Unauthorized("ï¿½ï¿½Ð§ï¿½ï¿½Authï¿½ï¿½ï¿½ï¿½Í·");
 
-            if (!QwenApi.Runtimes.cfgMgr.IsConfigured)
-                return BadRequest("ÅäÖÃÎ´Íê³É");
+            if (!QwenApi.Common.Runtimes.cfgMgr.IsConfigured)
+                return BadRequest("ï¿½ï¿½ï¿½ï¿½Î´ï¿½ï¿½ï¿½");
 
-            var resp = await NewSession.ExecuteAsync(new SessionReq());
+            var resp = await _qwenApiService.CreateSessionAsync();
             if (resp?.id == null)
-                return StatusCode(500, "´´½¨»á»°Ê§°Ü");
+                return StatusCode(500, "ï¿½ï¿½ï¿½ï¿½ï¿½á»°Ê§ï¿½ï¿½");
 
-            var session = await QwenApi.Apis.GetSessionHistory.ExecuteAsync(resp.id);
+            var session = await _qwenApiService.GetSessionHistoryAsync(resp.id);
             if (session == null)
-                return StatusCode(500, "ÎÞ·¨¼ÓÔØÐÂ»á»°");
+                return StatusCode(500, "ï¿½Þ·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â»á»°");
 
             return Ok(session);
         }
@@ -76,14 +77,14 @@ namespace QwenWebAPI.Controllers
         public async Task<ActionResult<SessionData>> GetSessionHistory(string sessionId)
         {
             if (!IsAuthValid())
-                return Unauthorized("ÎÞÐ§µÄAuthÇëÇóÍ·");
+                return Unauthorized("ï¿½ï¿½Ð§ï¿½ï¿½Authï¿½ï¿½ï¿½ï¿½Í·");
 
             if (!Guid.TryParse(sessionId, out _))
-                return BadRequest("ÎÞÐ§µÄ»á»°ID");
+                return BadRequest("ï¿½ï¿½Ð§ï¿½Ä»á»°ID");
 
-            var session = await QwenApi.Apis.GetSessionHistory.ExecuteAsync(sessionId);
+            var session = await _qwenApiService.GetSessionHistoryAsync(sessionId);
             if (session == null)
-                return NotFound("»á»°²»´æÔÚ»òÒÑÊ§Ð§");
+                return NotFound("ï¿½á»°ï¿½ï¿½ï¿½ï¿½ï¿½Ú»ï¿½ï¿½ï¿½Ê§Ð§");
 
             return Ok(session);
         }
@@ -96,26 +97,26 @@ namespace QwenWebAPI.Controllers
             if (!IsAuthValid())
             {
                 Response.StatusCode = 401;
-                await Response.WriteAsync("ÎÞÐ§µÄAuthÇëÇóÍ·");
+                await Response.WriteAsync("ï¿½ï¿½Ð§ï¿½ï¿½Authï¿½ï¿½ï¿½ï¿½Í·");
                 return;
             }
 
-            if (!QwenApi.Runtimes.cfgMgr.IsConfigured)
+            if (!QwenApi.Common.Runtimes.cfgMgr.IsConfigured)
             {
                 Response.StatusCode = 400;
-                await Response.WriteAsync("ÅäÖÃÎ´Íê³É");
+                await Response.WriteAsync("ï¿½ï¿½ï¿½ï¿½Î´ï¿½ï¿½ï¿½");
                 return;
             }
 
             if (string.IsNullOrEmpty(request.Content))
             {
                 Response.StatusCode = 400;
-                await Response.WriteAsync("ÏûÏ¢ÄÚÈÝ²»ÄÜÎª¿Õ");
+                await Response.WriteAsync("ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½Ý²ï¿½ï¿½ï¿½Îªï¿½ï¿½");
                 return;
             }
 
             string? parentId = null;
-            var history = await QwenApi.Apis.GetSessionHistory.ExecuteAsync(sessionId);
+            var history = await _qwenApiService.GetSessionHistoryAsync(sessionId);
             if (history?.Chat?.Messages?.Count > 0)
                 parentId = history.Chat.Messages.Last().Id;
 
@@ -125,12 +126,7 @@ namespace QwenWebAPI.Controllers
 
             try
             {
-                if(request.FileUrl != null)
-                {
-
-                }
-
-                await foreach (string jsonData in QwenApi.Apis.SendMessage.ExecuteAsync(
+                await foreach (string jsonData in _qwenApiService.SendMessageAsync(
                     chatId: sessionId,
                     messageContent: request.Content,
                     parentId: parentId,

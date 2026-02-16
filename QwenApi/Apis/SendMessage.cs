@@ -255,16 +255,24 @@ namespace QwenApi.Apis
                 Timestamp = timestamp
             };
 
-            var request = new HttpRequestMessage(HttpMethod.Post, $"{Runtimes.BaseUrl}api/v2/chat/completions?chat_id={chatId}")
+            var request = new HttpRequestMessage(HttpMethod.Post, $"{QwenApi.Common.Runtimes.BaseUrl}api/v2/chat/completions?chat_id={chatId}")
             {
                 Content = new StringContent(JsonConvert.SerializeObject(chatReq), Encoding.UTF8, "application/json")
             };
 
             request.AddCommonHeaders();
 
-            using var httpClient = new HttpClient();
-            using var response = await httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
-            response.EnsureSuccessStatusCode();
+            using var response = await QwenApi.Common.Runtimes.httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+            
+            try
+            {
+                response.EnsureSuccessStatusCode();
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"[API Error] HTTP请求失败: {ex.Message}, 状态码: {response.StatusCode}");
+                throw;
+            }
 
             using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
             using var reader = new StreamReader(stream);

@@ -133,22 +133,33 @@ namespace QwenApi.Apis
 
         public static async Task<QwenModelList?> ExecuteAsync()
         {
-            var request = new RestRequest($"/api/models", Method.Get);
-            request.AddCommonHeaders();
-
-            var response = await Runtimes.restClient.ExecuteAsync(request);
-
-            if (response.StatusCode != System.Net.HttpStatusCode.OK || string.IsNullOrEmpty(response.Content))
+            try
             {
+                var request = new RestRequest($"/api/models", Method.Get);
+                request.AddCommonHeaders();
+
+                var response = await QwenApi.Common.Runtimes.restClient.ExecuteAsync(request);
+
+                if (response.StatusCode != System.Net.HttpStatusCode.OK || string.IsNullOrEmpty(response.Content))
+                {
+                    Console.WriteLine($"[API Error] 获取模型列表失败，状态码: {response.StatusCode}");
+                    return null;
+                }
+
+                var apiResponse = JsonConvert.DeserializeObject<QwenModelList>(response.Content);
+                if (apiResponse != null && apiResponse.Data != null)
+                {
+                    return apiResponse;
+                }
+                
+                Console.WriteLine("[API Error] 模型列表数据解析失败");
                 return null;
             }
-
-            var apiResponse = JsonConvert.DeserializeObject<QwenModelList>(response.Content);
-            if (apiResponse != null && apiResponse.Data != null)
+            catch (Exception ex)
             {
-                return apiResponse;
+                Console.WriteLine($"[API Error] 获取模型列表异常: {ex.Message}");
+                return null;
             }
-            return null;
         }
     }
 }

@@ -1,16 +1,16 @@
-﻿using QwenApi;
-using QwenApi.Apis;
+﻿using QwenApi.Apis;
+using QwenApi.Common;
 using Spectre.Console;
 using Newtonsoft.Json.Linq;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 
-Console.WriteLine($"加载配置: {Runtimes.cfgMgr.Load()}");
-Console.WriteLine($"{Runtimes.cfgMgr.BxUa.Length},{Runtimes.cfgMgr.Cookie.Length},{Runtimes.cfgMgr.BxUmidtoken.Length}");
-if (!Runtimes.cfgMgr.IsConfigured)
+Console.WriteLine($"加载配置: {QwenApi.Common.Runtimes.cfgMgr.Load()}");
+Console.WriteLine($"{QwenApi.Common.Runtimes.cfgMgr.BxUa.Length},{QwenApi.Common.Runtimes.cfgMgr.Cookie.Length},{QwenApi.Common.Runtimes.cfgMgr.BxUmidtoken.Length}");
+if (!QwenApi.Common.Runtimes.cfgMgr.IsConfigured)
 {
-    AnsiConsole.MarkupLine("[red]配置不完整，请检查 config/config.txt[/]");
+    AnsiConsole.MarkupLine("[red]配置不完整，请检查 config/config.json[/]");
     return;
 }
 

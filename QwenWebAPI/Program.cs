@@ -1,7 +1,11 @@
-using QwenApi;
+using QwenApi.Common;
+using QwenApi.Services;
+using QwenWebAPI;
 using RestSharp;
 using System;
 using System.Collections.Generic;
+using System.Security.Cryptography;
+using System.Text;
 
 // Add services to the container.
 var builder = WebApplication.CreateBuilder(args);
@@ -16,6 +20,9 @@ builder.Services.AddCors(options =>
     });
 });
 
+// æ³¨å†Œä¾èµ–æ³¨å…¥æœåŠ¡
+builder.Services.AddSingleton<IQwenApiService, QwenApiService>();
+
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
@@ -29,13 +36,16 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors("AllowAll");
-Timer? configRefreshTimer = null;
+System.Threading.Timer? configRefreshTimer = null;
+
+// åˆå§‹åŒ–WebAPIé…ç½®
+InitializeWebApiConfig();
 
 if (args.Length > 0)
 {
-    Console.WriteLine($"½«Ê¹ÓÃ {args[0]} ×÷ÎªÑéÖ¤Ô´");
+    Console.WriteLine($"ï¿½ï¿½Ê¹ï¿½ï¿½ {args[0]} ï¿½ï¿½Îªï¿½ï¿½Ö¤Ô´");
 
-    configRefreshTimer = new Timer(async _ =>
+    configRefreshTimer = new System.Threading.Timer(async _ =>
     {
         try
         {
@@ -46,12 +56,12 @@ if (args.Length > 0)
             Console.WriteLine(response.ContentLength);
 
             var lines = response.Content.Split(Environment.NewLine);
-            Runtimes.cfgMgr.LoadString(lines[0], lines[1], lines[2]);
-            Console.WriteLine($"Load {Runtimes.cfgMgr.BxUa.Length},{Runtimes.cfgMgr.Cookie.Length},{Runtimes.cfgMgr.BxUmidtoken.Length}");
+            QwenApi.Common.Runtimes.cfgMgr.LoadString(lines[0], lines[1], lines[2]);
+            Console.WriteLine($"Load {QwenApi.Common.Runtimes.cfgMgr.BxUa.Length},{QwenApi.Common.Runtimes.cfgMgr.Cookie.Length},{QwenApi.Common.Runtimes.cfgMgr.BxUmidtoken.Length}");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"ÅäÖÃË¢ĞÂÊ§°Ü: {ex}");
+            Console.WriteLine($"ï¿½ï¿½ï¿½ï¿½Ë¢ï¿½ï¿½Ê§ï¿½ï¿½: {ex}");
         }
     },
     null,
@@ -60,12 +70,12 @@ if (args.Length > 0)
 }
 else
 {
-    Console.WriteLine($"¼ÓÔØÅäÖÃ: {Runtimes.cfgMgr.Load()}");
-    Console.WriteLine($"{Runtimes.cfgMgr.BxUa.Length},{Runtimes.cfgMgr.Cookie.Length},{Runtimes.cfgMgr.BxUmidtoken.Length}");
-    if (!Runtimes.cfgMgr.IsConfigured)
+    Console.WriteLine($"ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: {QwenApi.Common.Runtimes.cfgMgr.Load()}");
+    Console.WriteLine($"{QwenApi.Common.Runtimes.cfgMgr.BxUa.Length},{QwenApi.Common.Runtimes.cfgMgr.Cookie.Length},{QwenApi.Common.Runtimes.cfgMgr.BxUmidtoken.Length}");
+    if (!QwenApi.Common.Runtimes.cfgMgr.IsConfigured)
     {
-        Console.WriteLine("ÅäÖÃ²»ÍêÕû£¬Çë¼ì²é config/config.txt");
-        return;
+        Console.WriteLine("ï¿½ï¿½ï¿½Ã²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ config/config.json");
+        Environment.Exit(1);
     }
 }
 
@@ -76,3 +86,30 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+void InitializeWebApiConfig()
+{
+    // åŠ è½½WebAPIé…ç½®
+    QwenWebAPI.Runtimes.ConfigManager.Load();
+    
+    // å¦‚æœAuthTokenä¸ºç©ºï¼Œç”Ÿæˆä¸€ä¸ªéšæœºçš„
+    if (string.IsNullOrEmpty(QwenWebAPI.Runtimes.AuthToken))
+    {
+        QwenWebAPI.Runtimes.AuthToken = GenerateRandomAuthToken();
+        QwenWebAPI.Runtimes.ConfigManager.AuthToken = QwenWebAPI.Runtimes.AuthToken;
+        QwenWebAPI.Runtimes.ConfigManager.Save();
+        Console.WriteLine($"èº«ä»½éªŒè¯Token: {QwenWebAPI.Runtimes.AuthToken}");
+    }
+    else
+    {
+        Console.WriteLine($"å·²åŠ è½½Token");
+    }
+}
+
+string GenerateRandomAuthToken()
+{
+    using var rng = RandomNumberGenerator.Create();
+    var bytes = new byte[32];
+    rng.GetBytes(bytes);
+    return Convert.ToHexString(bytes).ToLower();
+}
